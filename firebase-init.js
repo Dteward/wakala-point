@@ -26,13 +26,13 @@ import {
 } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-auth.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyA2vYRwd8qNcz7U7_WVf8nGt6Ta1kf_g9I",
-  authDomain: "wakalapoint-1b62d.firebaseapp.com",
-  databaseURL: "https://wakalapoint-1b62d-default-rtdb.firebaseio.com",
-  projectId: "wakalapoint-1b62d",
-  storageBucket: "wakalapoint-1b62d.firebasestorage.app",
-  messagingSenderId: "721272156238",
-  appId: "1:721272156238:web:b43fde49cff97cd249d31f",
+  apiKey: "AIzaSyB36tCsZPPstZvojZLE6srWUVNahdzgvZw",
+  authDomain: "wakala-point.firebaseapp.com",
+  projectId: "wakala-point",
+  storageBucket: "wakala-point.firebasestorage.app",
+  messagingSenderId: "601072568380",
+  appId: "1:601072568380:web:4210c8a78610413aeddb39",
+  measurementId: "G-D085CTF9C7"
 };
 
 const app = initializeApp(firebaseConfig);
