@@ -4,229 +4,482 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, viewport-fit=cover">
   <title>Admin — Wakala Point</title>
+
   <link rel="manifest" href="manifest.json">
   <link rel="stylesheet" href="fonts.css">
   <link rel="stylesheet" href="icons-alipay.css">
   <link rel="stylesheet" href="bootstrap.css">
   <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="wakala.css">
+
   <style>
-    :root {
-      --admin-bg: #0D1B2A;
-      --admin-surface: #152336;
-      --admin-card: #1C2E42;
-      --admin-border: rgba(255,255,255,0.07);
-      --admin-text: #F0F4FF;
-      --admin-muted: rgba(240,244,255,0.45);
-      --admin-accent: #3B82F6;
-      --admin-accent-glow: rgba(59,130,246,0.25);
-      --admin-green: #10B981;
-      --admin-green-glow: rgba(16,185,129,0.2);
-      --admin-amber: #F59E0B;
-      --admin-amber-glow: rgba(245,158,11,0.2);
-      --admin-red: #EF4444;
-      --admin-red-glow: rgba(239,68,68,0.2);
-      --admin-purple: #8B5CF6;
-      --admin-purple-glow: rgba(139,92,246,0.2);
+    /* =========================
+       PIN LOCK
+    ========================== */
+    .pin-dot {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.2);
+      border: 1.5px solid rgba(255,255,255,0.5);
+      transition: background .15s, transform .15s;
+    }
+    .pin-dot.filled {
+      background: #fff;
+      transform: scale(1.08);
+    }
+    .pin-dot.error {
+      background: #FF6B6B;
+      border-color: #FF6B6B;
+    }
+    .pin-key {
+      width: 100%;
+      aspect-ratio: 1;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.18);
+      color: #fff;
+      font-size: 20px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background .12s, transform .08s;
+    }
+    .pin-key:active {
+      background: rgba(255,255,255,0.28);
+      transform: scale(.93);
+    }
+    .pin-key-ghost {
+      background: transparent !important;
+      border: none !important;
+      font-size: 12px;
+      font-weight: 700;
+      color: rgba(255,255,255,0.62);
+    }
+    .pin-shake { animation: pinShake .4s; }
+    @keyframes pinShake {
+      10%, 90% { transform: translateX(-1px); }
+      20%, 80% { transform: translateX(2px); }
+      30%, 50%, 70% { transform: translateX(-4px); }
+      40%, 60% { transform: translateX(4px); }
     }
 
-    * { box-sizing: border-box; }
-    body { background: var(--admin-bg) !important; }
+    /* =========================
+       BOTTOM NAV
+    ========================== */
+    .admin-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 200;
+      background: #fff;
+      border-top: 1px solid #eee;
+      display: flex;
+      height: 60px;
+    }
+    .admin-nav-item {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      cursor: pointer;
+      border: none;
+      background: none;
+      color: #aaa;
+      font-size: 10px;
+      font-weight: 700;
+      transition: color .2s;
+    }
+    .admin-nav-item i { font-size: 20px; }
+    .admin-nav-item.active { color: var(--wakala-primary); }
 
-    /* ── PIN ── */
-    .pin-dot { width:13px;height:13px;border-radius:50%;background:rgba(255,255,255,0.15);border:1.5px solid rgba(255,255,255,0.35);transition:all .15s; }
-    .pin-dot.filled { background:#fff;border-color:#fff;transform:scale(1.12);box-shadow:0 0 8px rgba(255,255,255,0.5); }
-    .pin-dot.error  { background:#EF4444;border-color:#EF4444; }
-    .pin-key { width:100%;aspect-ratio:1;border-radius:50%;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);color:#fff;font-size:22px;font-weight:600;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .12s;-webkit-tap-highlight-color:transparent;user-select:none;touch-action:manipulation; }
-    .pin-key * { pointer-events:none; }
-    .pin-key:active { background:rgba(255,255,255,0.2);transform:scale(0.92); }
-    .pin-key-ghost  { background:transparent!important;border:none!important;font-size:12px;font-weight:600;color:rgba(255,255,255,0.4); }
-    .pin-shake { animation:pinShake .4s; }
-    @keyframes pinShake { 10%,90%{transform:translateX(-2px)}20%,80%{transform:translateX(3px)}30%,50%,70%{transform:translateX(-5px)}40%,60%{transform:translateX(5px)} }
+    /* =========================
+       STATS
+    ========================== */
+    .stat-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+    .stat-card {
+      background: #fff;
+      border-radius: 16px;
+      padding: 14px 16px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+    }
+    .stat-card .label {
+      font-size: 11px;
+      color: var(--wakala-text-muted);
+      margin: 0 0 4px;
+    }
+    .stat-card .value {
+      font-size: 26px;
+      font-weight: 800;
+      margin: 0;
+      line-height: 1;
+    }
+    .stat-card.full { grid-column: span 2; }
 
-    /* ── Header ── */
-    .admin-header { position:fixed;top:0;left:0;right:0;z-index:300;height:62px;background:var(--admin-bg);border-bottom:1px solid var(--admin-border);display:flex;align-items:center;padding:0 16px;gap:12px; }
-    .admin-header-logo { width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--admin-accent),#1D4ED8);display:flex;align-items:center;justify-content:center;flex-shrink:0; }
-    .admin-header-title { flex:1; }
-    .admin-header-title p { margin:0;font-size:9px;color:var(--admin-muted);text-transform:uppercase;letter-spacing:.8px; }
-    .admin-header-title h4 { margin:0;font-size:14px;font-weight:800;color:var(--admin-text); }
-    .admin-logout-btn { background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.25);color:#EF4444;font-size:11px;font-weight:700;padding:6px 14px;border-radius:20px;cursor:pointer;display:flex;align-items:center;gap:5px; }
+    /* =========================
+       PILLS
+    ========================== */
+    .pill-row {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+      margin-bottom: 12px;
+      scrollbar-width: none;
+    }
+    .pill-row::-webkit-scrollbar { display: none; }
+    .pill {
+      background: #f1f1f1;
+      border: none;
+      border-radius: 20px;
+      padding: 6px 14px;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--wakala-text-muted);
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all .18s;
+    }
+    .pill.active {
+      background: var(--wakala-primary);
+      color: #fff;
+    }
 
-    /* ── Bottom Nav ── */
-    .admin-nav { position:fixed;bottom:0;left:0;right:0;z-index:300;height:64px;background:var(--admin-surface);border-top:1px solid var(--admin-border);display:flex;backdrop-filter:blur(12px); }
-    .admin-nav-item { flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;border:none;background:none;color:var(--admin-muted);font-size:10px;font-weight:600;transition:color .2s;-webkit-tap-highlight-color:transparent; }
-    .admin-nav-item i { font-size:21px; }
-    .admin-nav-item.active { color:var(--admin-accent); }
-    .admin-nav-item .nav-dot { width:4px;height:4px;border-radius:50%;background:var(--admin-accent);margin-top:1px;display:none; }
-    .admin-nav-item.active .nav-dot { display:block; }
+    /* =========================
+       SEARCH
+    ========================== */
+    .search-wrap {
+      position: relative;
+      margin-bottom: 12px;
+    }
+    .search-wrap i {
+      position: absolute;
+      left: 13px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #bbb;
+      font-size: 16px;
+    }
+    .search-wrap input {
+      width: 100%;
+      padding: 11px 14px 11px 38px;
+      border: 1.5px solid #eee;
+      border-radius: 12px;
+      font-size: 13px;
+      outline: none;
+      background: #fafafa;
+    }
+    .search-wrap input:focus {
+      border-color: var(--wakala-primary);
+      background: #fff;
+    }
 
-    /* ── Scroll area ── */
-    #app-wrap { padding-top:62px;padding-bottom:72px;min-height:100vh; }
-    .page-pad { padding:16px; }
+    /* =========================
+       REQUEST CARD
+    ========================== */
+    .req-card {
+      background: #fff;
+      border-radius: 14px;
+      padding: 14px 16px;
+      margin-bottom: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+      border: 1px solid #f0f0f0;
+      cursor: pointer;
+      transition: transform .15s;
+    }
+    .req-card:active { transform: scale(0.985); }
+    .req-card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+      gap: 10px;
+    }
+    .req-card-name {
+      font-size: 15px;
+      font-weight: 700;
+      margin: 0 0 2px;
+      color: var(--wakala-text);
+    }
+    .req-card-meta {
+      font-size: 11px;
+      color: var(--wakala-text-muted);
+      margin: 0;
+    }
 
-    /* ── Stat cards ── */
-    .stats-hero { background:linear-gradient(135deg,var(--admin-surface) 0%,var(--admin-card) 100%);border-radius:20px;padding:20px;margin-bottom:14px;border:1px solid var(--admin-border);position:relative;overflow:hidden; }
-    .stats-hero::before { content:'';position:absolute;top:-30px;right:-30px;width:120px;height:120px;border-radius:50%;background:var(--admin-accent-glow);pointer-events:none; }
-    .stats-hero-top { display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:18px; }
-    .stats-hero-label { font-size:10px;color:var(--admin-muted);text-transform:uppercase;letter-spacing:.6px;margin:0 0 4px; }
-    .stats-hero-value { font-size:40px;font-weight:900;color:#fff;margin:0;line-height:1; }
-    .stats-hero-sub { font-size:11px;color:var(--admin-muted);margin:0; }
+    /* =========================
+       BADGES
+    ========================== */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 10px;
+      font-weight: 800;
+    }
+    .badge-pending    { background: #FEF3C7; color: #B45309; }
+    .badge-processing { background: #DBEAFE; color: #1D4ED8; }
+    .badge-approved   { background: #D1FAE5; color: #065F46; }
+    .badge-rejected   { background: #FEE2E2; color: #B91C1C; }
 
-    .mini-stats { display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px; }
-    .mini-card { border-radius:16px;padding:14px 16px;border:1px solid var(--admin-border);position:relative;overflow:hidden; }
-    .mini-card::after { content:'';position:absolute;bottom:-10px;right:-10px;width:50px;height:50px;border-radius:50%;opacity:.4;pointer-events:none; }
-    .mini-card.blue  { background:linear-gradient(135deg,rgba(59,130,246,0.12),rgba(59,130,246,0.04)); }
-    .mini-card.blue::after  { background:var(--admin-accent-glow); }
-    .mini-card.amber { background:linear-gradient(135deg,rgba(245,158,11,0.12),rgba(245,158,11,0.04)); }
-    .mini-card.amber::after { background:var(--admin-amber-glow); }
-    .mini-card.green { background:linear-gradient(135deg,rgba(16,185,129,0.12),rgba(16,185,129,0.04)); }
-    .mini-card.green::after { background:var(--admin-green-glow); }
-    .mini-card.red   { background:linear-gradient(135deg,rgba(239,68,68,0.12),rgba(239,68,68,0.04)); }
-    .mini-card.red::after   { background:var(--admin-red-glow); }
-    .mini-card.purple{ background:linear-gradient(135deg,rgba(139,92,246,0.12),rgba(139,92,246,0.04)); }
-    .mini-card.purple::after{ background:var(--admin-purple-glow); }
-    .mini-card-icon { font-size:18px;margin-bottom:8px;display:block; }
-    .mini-card-label { font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin:0 0 4px;opacity:.6; }
-    .mini-card-value { font-size:28px;font-weight:900;margin:0;line-height:1; }
-    .mini-card.blue .mini-card-label, .mini-card.blue .mini-card-value, .mini-card.blue .mini-card-icon { color:var(--admin-accent); }
-    .mini-card.amber .mini-card-label,.mini-card.amber .mini-card-value,.mini-card.amber .mini-card-icon { color:var(--admin-amber); }
-    .mini-card.green .mini-card-label,.mini-card.green .mini-card-value,.mini-card.green .mini-card-icon { color:var(--admin-green); }
-    .mini-card.red .mini-card-label,.mini-card.red .mini-card-value,.mini-card.red .mini-card-icon { color:var(--admin-red); }
-    .mini-card.purple .mini-card-label,.mini-card.purple .mini-card-value,.mini-card.purple .mini-card-icon { color:var(--admin-purple); }
+    /* =========================
+       SERVICE TAG
+    ========================== */
+    .svc-tag {
+      font-size: 10px;
+      font-weight: 800;
+      color: var(--wakala-primary);
+      background: rgba(var(--wakala-primary-rgb,30,86,160),0.08);
+      padding: 2px 8px;
+      border-radius: 6px;
+      white-space: nowrap;
+    }
 
-    /* ── Status bar chart ── */
-    .status-chart { background:var(--admin-card);border-radius:16px;padding:16px;margin-bottom:14px;border:1px solid var(--admin-border); }
-    .chart-title { font-size:11px;font-weight:700;color:var(--admin-muted);text-transform:uppercase;letter-spacing:.5px;margin:0 0 12px; }
-    .chart-bars { display:flex;gap:6px;align-items:flex-end;height:64px;margin-bottom:10px; }
-    .chart-bar-wrap { flex:1;display:flex;flex-direction:column;align-items:center;gap:5px; }
-    .chart-bar { width:100%;border-radius:6px 6px 0 0;min-height:4px;transition:height .6s cubic-bezier(.34,1.56,.64,1); }
-    .chart-bar.blue   { background:linear-gradient(180deg,var(--admin-accent),#1D4ED8); }
-    .chart-bar.amber  { background:linear-gradient(180deg,var(--admin-amber),#D97706); }
-    .chart-bar.green  { background:linear-gradient(180deg,var(--admin-green),#059669); }
-    .chart-bar.red    { background:linear-gradient(180deg,var(--admin-red),#DC2626); }
-    .chart-bar-label  { font-size:9px;font-weight:600;color:var(--admin-muted);text-align:center; }
-    .chart-bar-val    { font-size:10px;font-weight:800;color:var(--admin-text); }
+    /* =========================
+       USER CARD
+    ========================== */
+    .user-card {
+      background: #fff;
+      border-radius: 14px;
+      padding: 14px 16px;
+      margin-bottom: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+      border: 1px solid #f0f0f0;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .user-avatar {
+      width: 42px;
+      height: 42px;
+      border-radius: 13px;
+      background: var(--wakala-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-size: 15px;
+      font-weight: 800;
+      color: #fff;
+    }
+    .user-avatar.blocked { background: #DC2626; }
+    .user-info {
+      flex: 1;
+      min-width: 0;
+    }
+    .user-name {
+      font-size: 14px;
+      font-weight: 700;
+      margin: 0 0 2px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      flex-wrap: wrap;
+    }
+    .user-sub {
+      font-size: 11px;
+      color: var(--wakala-text-muted);
+      margin: 0;
+    }
+    .badge-admin {
+      background: #EEF2FF;
+      color: #4338CA;
+      font-size: 9px;
+      font-weight: 800;
+      padding: 2px 7px;
+      border-radius: 10px;
+    }
+    .badge-blocked {
+      background: #FEE2E2;
+      color: #B91C1C;
+      font-size: 9px;
+      font-weight: 800;
+      padding: 2px 7px;
+      border-radius: 10px;
+    }
+    .block-btn {
+      flex-shrink: 0;
+      border: none;
+      border-radius: 10px;
+      padding: 7px 13px;
+      font-size: 11px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: all .15s;
+    }
+    .block-btn.zuia   { background: #FEE2E2; color: #DC2626; }
+    .block-btn.fungua { background: #D1FAE5; color: #059669; }
+    .block-btn:active { opacity: .75; }
 
-    /* ── Section label ── */
-    .sec-label { font-size:10px;font-weight:800;color:var(--admin-muted);text-transform:uppercase;letter-spacing:.8px;margin:0 0 10px;display:flex;align-items:center;gap:6px; }
-    .sec-label::after { content:'';flex:1;height:1px;background:var(--admin-border); }
+    /* =========================
+       MODAL
+    ========================== */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.45);
+      z-index: 1000;
+      overflow-y: auto;
+    }
+    .modal-box {
+      background: #fff;
+      margin: 20px 14px 100px;
+      border-radius: 20px;
+      overflow: hidden;
+    }
+    .modal-header {
+      background: var(--wakala-primary);
+      padding: 18px 20px;
+      color: #fff;
+      position: relative;
+    }
+    .modal-header h3 {
+      font-size: 15px;
+      font-weight: 800;
+      margin: 0 0 10px;
+    }
+    .modal-meta {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+    }
+    .modal-meta-item p:first-child {
+      font-size: 9px;
+      opacity: .65;
+      margin: 0;
+    }
+    .modal-meta-item p:last-child {
+      font-size: 12px;
+      font-weight: 700;
+      margin: 0;
+    }
+    .modal-body { padding: 18px 20px; }
+    .detail-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid #f0f0f0;
+      gap: 12px;
+    }
+    .detail-row:last-child { border-bottom: none; }
+    .detail-label {
+      font-size: 12px;
+      color: var(--wakala-text-muted);
+      flex-shrink: 0;
+    }
+    .detail-val {
+      font-size: 12px;
+      font-weight: 600;
+      text-align: right;
+      word-break: break-word;
+    }
+    .modal-close-btn {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      background: rgba(255,255,255,0.2);
+      border: none;
+      color: #fff;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 14px;
+    }
 
-    /* ── Pill filters ── */
-    .pill-row { display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;margin-bottom:12px;scrollbar-width:none; }
-    .pill-row::-webkit-scrollbar { display:none; }
-    .pill { background:var(--admin-card);border:1px solid var(--admin-border);border-radius:20px;padding:6px 14px;font-size:11px;font-weight:600;color:var(--admin-muted);cursor:pointer;white-space:nowrap;transition:all .18s;-webkit-tap-highlight-color:transparent; }
-    .pill.active { background:var(--admin-accent);border-color:var(--admin-accent);color:#fff; }
-
-    /* ── Search ── */
-    .search-wrap { position:relative;margin-bottom:12px; }
-    .search-wrap i { position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--admin-muted);font-size:16px; }
-    .search-wrap input { width:100%;padding:11px 14px 11px 40px;border:1px solid var(--admin-border);border-radius:12px;font-size:13px;outline:none;background:var(--admin-card);color:var(--admin-text);caret-color:var(--admin-accent); }
-    .search-wrap input::placeholder { color:var(--admin-muted); }
-    .search-wrap input:focus { border-color:var(--admin-accent);box-shadow:0 0 0 3px var(--admin-accent-glow); }
-
-    /* ── Request cards ── */
-    .req-card { background:var(--admin-card);border-radius:16px;padding:14px 16px;margin-bottom:8px;border:1px solid var(--admin-border);cursor:pointer;transition:all .15s;-webkit-tap-highlight-color:transparent; }
-    .req-card:active { transform:scale(0.98);border-color:var(--admin-accent); }
-    .req-card-top { display:flex;justify-content:space-between;align-items:center;margin-bottom:8px; }
-    .req-card-name { font-size:15px;font-weight:700;color:var(--admin-text);margin:0 0 3px; }
-    .req-card-meta { font-size:11px;color:var(--admin-muted); }
-    .req-card-bottom { display:flex;justify-content:space-between;align-items:center;margin-top:10px;padding-top:10px;border-top:1px solid var(--admin-border); }
-
-    /* ── Svc tag ── */
-    .svc-tag { font-size:10px;font-weight:700;background:rgba(59,130,246,0.12);color:var(--admin-accent);padding:3px 10px;border-radius:8px;border:1px solid rgba(59,130,246,0.2); }
-
-    /* ── Status badges ── */
-    .sbadge { display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:20px;font-size:10px;font-weight:700; }
-    .sbadge::before { content:'';width:5px;height:5px;border-radius:50%; }
-    .sbadge-pending    { background:rgba(245,158,11,0.12);color:var(--admin-amber); }
-    .sbadge-pending::before { background:var(--admin-amber); }
-    .sbadge-processing { background:rgba(59,130,246,0.12);color:var(--admin-accent); }
-    .sbadge-processing::before { background:var(--admin-accent); }
-    .sbadge-approved   { background:rgba(16,185,129,0.12);color:var(--admin-green); }
-    .sbadge-approved::before { background:var(--admin-green); }
-    .sbadge-rejected   { background:rgba(239,68,68,0.12);color:var(--admin-red); }
-    .sbadge-rejected::before { background:var(--admin-red); }
-
-    /* ── User cards ── */
-    .user-card { background:var(--admin-card);border-radius:16px;padding:14px 16px;margin-bottom:8px;border:1px solid var(--admin-border);display:flex;align-items:center;gap:12px;transition:border-color .15s; }
-    .user-card.is-blocked { border-color:rgba(239,68,68,0.3);background:rgba(239,68,68,0.04); }
-    .user-avatar { width:44px;height:44px;border-radius:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:16px;font-weight:800;color:#fff;background:linear-gradient(135deg,var(--admin-accent),#1D4ED8); }
-    .user-avatar.blocked-av { background:linear-gradient(135deg,#EF4444,#B91C1C); }
-    .user-avatar.admin-av   { background:linear-gradient(135deg,var(--admin-purple),#6D28D9); }
-    .user-info { flex:1;min-width:0; }
-    .user-name { font-size:14px;font-weight:700;color:var(--admin-text);margin:0 0 3px;display:flex;align-items:center;gap:5px;flex-wrap:wrap; }
-    .user-sub  { font-size:11px;color:var(--admin-muted);margin:0; }
-    .ubadge-admin   { background:rgba(139,92,246,0.15);color:var(--admin-purple);font-size:9px;font-weight:700;padding:2px 8px;border-radius:8px;border:1px solid rgba(139,92,246,0.25); }
-    .ubadge-blocked { background:rgba(239,68,68,0.12);color:var(--admin-red);font-size:9px;font-weight:700;padding:2px 8px;border-radius:8px;border:1px solid rgba(239,68,68,0.2); }
-    .block-btn { flex-shrink:0;border:none;border-radius:10px;padding:8px 13px;font-size:11px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:5px;transition:all .15s;-webkit-tap-highlight-color:transparent; }
-    .block-btn.do-block  { background:rgba(239,68,68,0.12);color:var(--admin-red);border:1px solid rgba(239,68,68,0.2); }
-    .block-btn.do-unblock{ background:rgba(16,185,129,0.12);color:var(--admin-green);border:1px solid rgba(16,185,129,0.2); }
-    .block-btn:active { opacity:.7;transform:scale(0.95); }
-
-    /* ── Users hero row ── */
-    .users-hero { display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px; }
-    .users-hero-card { border-radius:16px;padding:14px 16px;border:1px solid var(--admin-border); }
-
-    /* ── Modal ── */
-    .modal-overlay { display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:1000;overflow-y:auto;backdrop-filter:blur(4px); }
-    .modal-box { background:var(--admin-surface);margin:20px 12px 80px;border-radius:22px;overflow:hidden;border:1px solid var(--admin-border); }
-    .modal-hdr { background:linear-gradient(135deg,#1e3a5f,var(--admin-card));padding:18px 20px;position:relative; }
-    .modal-hdr-title { font-size:15px;font-weight:800;color:#fff;margin:0 0 3px; }
-    .modal-hdr-meta { display:flex;gap:16px;margin-top:10px; }
-    .modal-hdr-meta-item p:first-child { font-size:9px;color:rgba(255,255,255,0.45);margin:0;text-transform:uppercase;letter-spacing:.4px; }
-    .modal-hdr-meta-item p:last-child  { font-size:12px;font-weight:700;color:#fff;margin:0; }
-    .modal-close { position:absolute;top:14px;right:14px;background:rgba(255,255,255,0.1);border:none;color:#fff;width:30px;height:30px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px; }
-    .modal-body { padding:18px 20px; }
-    .detail-row { display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--admin-border);gap:12px; }
-    .detail-row:last-child { border:none; }
-    .detail-label { font-size:12px;color:var(--admin-muted);flex-shrink:0; }
-    .detail-val   { font-size:12px;font-weight:600;color:var(--admin-text);text-align:right; }
-    .modal-sec-label { font-size:10px;font-weight:700;color:var(--admin-muted);text-transform:uppercase;letter-spacing:.6px;margin:16px 0 10px;display:flex;align-items:center;gap:6px; }
-    .modal-sec-label::after { content:'';flex:1;height:1px;background:var(--admin-border); }
-    .modal-select { width:100%;padding:11px 14px;border:1px solid var(--admin-border);border-radius:12px;background:var(--admin-card);color:var(--admin-text);font-size:13px;font-weight:600;outline:none;margin-bottom:12px; }
-    .modal-select:focus { border-color:var(--admin-accent); }
-    .modal-textarea { width:100%;padding:11px 14px;border:1px solid var(--admin-border);border-radius:12px;background:var(--admin-card);color:var(--admin-text);font-size:13px;outline:none;resize:none;margin-bottom:14px; }
-    .modal-textarea::placeholder { color:var(--admin-muted); }
-    .modal-textarea:focus { border-color:var(--admin-accent); }
-    .modal-save-btn { width:100%;padding:14px;background:linear-gradient(135deg,var(--admin-accent),#1D4ED8);color:#fff;border:none;border-radius:14px;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:opacity .2s; }
-    .modal-save-btn:disabled { opacity:.5; }
-
-    /* ── Empty ── */
-    .admin-empty { text-align:center;padding:48px 20px; }
-    .admin-empty i { font-size:44px;color:var(--admin-muted);opacity:.3;display:block;margin-bottom:12px; }
-    .admin-empty h4 { font-size:15px;font-weight:700;color:var(--admin-text);margin:0 0 4px; }
-    .admin-empty p  { font-size:13px;color:var(--admin-muted);margin:0; }
-
-    /* ── Toast ── */
-    .wp-toast { position:fixed;bottom:76px;left:50%;transform:translateX(-50%);background:var(--admin-card);color:var(--admin-text);padding:10px 22px;border-radius:30px;font-size:13px;font-weight:600;z-index:9999;pointer-events:none;border:1px solid var(--admin-border);box-shadow:0 8px 32px rgba(0,0,0,0.4);white-space:nowrap; }
-
-    /* ── Reset PIN screen ── */
-    #pin-reset-screen { background:var(--admin-bg) !important; }
-    #pin-reset-screen label { color:var(--admin-muted) !important; }
-    #pin-reset-screen input { background:var(--admin-card) !important;border-color:var(--admin-border) !important;color:var(--admin-text) !important; }
-    #pin-reset-screen h3,#pin-reset-screen p { color:var(--admin-text) !important; }
-
-    /* ── Divider on dark ── */
-    .dark-divider { border:none;border-top:1px solid var(--admin-border);margin:14px 0; }
+    /* =========================
+       HEADINGS / EMPTY / TOAST
+    ========================== */
+    .section-heading {
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--wakala-text-muted);
+      text-transform: uppercase;
+      letter-spacing: .5px;
+      margin: 0 0 10px;
+    }
+    .empty {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--wakala-text-muted);
+    }
+    .empty i {
+      font-size: 40px;
+      opacity: .3;
+      display: block;
+      margin-bottom: 10px;
+    }
+    .empty h4 {
+      font-size: 15px;
+      font-weight: 800;
+      margin: 0 0 4px;
+      color: var(--wakala-text);
+    }
+    .empty p {
+      font-size: 13px;
+      margin: 0;
+    }
+    .wp-toast {
+      position: fixed;
+      bottom: 72px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #111;
+      color: #fff;
+      padding: 10px 22px;
+      border-radius: 30px;
+      font-size: 13px;
+      font-weight: 700;
+      z-index: 9999;
+      pointer-events: none;
+      max-width: calc(100vw - 32px);
+      text-align: center;
+    }
   </style>
 </head>
-<body>
-  <!-- ===== PIN Lock ===== -->
-  <div id="pin-lock-screen" style="position:fixed;inset:0;z-index:5000;background:linear-gradient(160deg,#0D1B2A 0%,#152336 50%,#0D1B2A 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;">
-    <!-- Glow orb -->
-    <div style="position:absolute;top:-60px;left:50%;transform:translateX(-50%);width:240px;height:240px;border-radius:50%;background:rgba(59,130,246,0.12);filter:blur(60px);pointer-events:none;"></div>
-    <div style="width:100%;max-width:300px;text-align:center;position:relative;">
-      <div style="width:64px;height:64px;border-radius:20px;background:linear-gradient(135deg,rgba(59,130,246,0.3),rgba(29,78,216,0.3));border:1px solid rgba(59,130,246,0.3);display:flex;align-items:center;justify-content:center;margin:0 auto 18px;backdrop-filter:blur(8px);">
-        <i class="icon-secure1" style="font-size:26px;color:#60A5FA;"></i>
+<body class="bg_surface_color">
+
+  <div class="preload preload-container">
+    <div class="preload-logo"><div class="spinner"></div></div>
+  </div>
+
+  <!-- =========================
+       PIN LOCK SCREEN
+  ========================== -->
+  <div id="pin-lock-screen" style="position:fixed;inset:0;z-index:5000;background:linear-gradient(135deg,var(--wakala-primary) 0%,var(--wakala-primary-dark) 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;">
+    <div style="width:100%;max-width:300px;text-align:center;">
+      <div style="width:60px;height:60px;border-radius:18px;background:rgba(255,255,255,0.12);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
+        <i class="icon-secure1" style="font-size:26px;color:#fff;"></i>
       </div>
-      <h3 style="color:#fff;font-size:18px;font-weight:800;margin:0 0 4px;">Admin Panel</h3>
-      <p style="color:rgba(255,255,255,0.4);font-size:12px;margin:0 0 28px;">Weka PIN ya tarakimu 4</p>
-      <div id="pin-dots" style="display:flex;justify-content:center;gap:16px;margin-bottom:12px;">
-        <span class="pin-dot"></span><span class="pin-dot"></span>
-        <span class="pin-dot"></span><span class="pin-dot"></span>
+
+      <h3 style="color:#fff;font-size:17px;font-weight:800;margin:0 0 4px;">Panel ya Msimamizi</h3>
+      <p style="color:rgba(255,255,255,0.6);font-size:12px;margin:0 0 26px;">Weka PIN ya tarakimu 4</p>
+
+      <div id="pin-dots" style="display:flex;justify-content:center;gap:14px;margin-bottom:12px;">
+        <span class="pin-dot"></span>
+        <span class="pin-dot"></span>
+        <span class="pin-dot"></span>
+        <span class="pin-dot"></span>
       </div>
-      <p id="pin-error" style="color:#FCA5A5;font-size:11px;font-weight:600;min-height:16px;margin:0 0 20px;"></p>
-      <div id="pin-keypad" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;max-width:240px;margin:0 auto;">
+
+      <p id="pin-error" style="color:#FFD3D3;font-size:11px;font-weight:700;min-height:16px;margin:0 0 18px;"></p>
+
+      <div id="pin-keypad" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;max-width:240px;margin:0 auto;">
         <button class="pin-key" data-num="1">1</button>
         <button class="pin-key" data-num="2">2</button>
         <button class="pin-key" data-num="3">3</button>
@@ -238,113 +491,118 @@
         <button class="pin-key" data-num="9">9</button>
         <button class="pin-key pin-key-ghost" id="pin-forgot-btn">Weka upya</button>
         <button class="pin-key" data-num="0">0</button>
-        <button class="pin-key pin-key-ghost" id="pin-backspace-btn" style="font-size:20px;">⌫</button>
+        <button class="pin-key pin-key-ghost" id="pin-backspace-btn"><i class="icon-left"></i></button>
       </div>
-      <p style="margin-top:24px;"><a href="login.html" style="color:rgba(255,255,255,0.25);font-size:11px;">Rudi kwenye Ingia</a></p>
+
+      <p style="margin-top:22px;">
+        <a href="login.html" style="color:rgba(255,255,255,0.45);font-size:11px;">Rudi kwenye Ingia</a>
+      </p>
     </div>
   </div>
 
-  <!-- ===== Reset PIN ===== -->
-  <div id="pin-reset-screen" style="display:none;position:fixed;inset:0;z-index:5001;background:var(--admin-bg);flex-direction:column;padding:24px;overflow-y:auto;">
+  <!-- =========================
+       RESET PIN SCREEN
+  ========================== -->
+  <div id="pin-reset-screen" style="display:none;position:fixed;inset:0;z-index:5001;background:var(--wakala-surface);flex-direction:column;padding:24px;overflow-y:auto;">
     <div style="width:100%;max-width:340px;margin:40px auto 0;">
-      <button id="pin-reset-back" style="background:none;border:none;color:var(--admin-accent);font-size:13px;font-weight:700;padding:0;margin-bottom:22px;display:flex;align-items:center;gap:6px;cursor:pointer;"><i class="icon-left"></i> Rudi</button>
-      <h3 style="font-size:17px;font-weight:800;color:var(--admin-text);margin:0 0 4px;">Weka Upya PIN</h3>
-      <p style="font-size:12px;color:var(--admin-muted);margin:0 0 22px;">Thibitisha PIN ya zamani kisha weka PIN mpya.</p>
-      <div class="group-input"><label>PIN ya Zamani</label><input type="password" inputmode="numeric" pattern="[0-9]*" maxlength="4" id="reset-old-pin" placeholder="••••"></div>
-      <div class="group-input"><label>PIN Mpya</label><input type="password" inputmode="numeric" pattern="[0-9]*" maxlength="4" id="reset-new-pin" placeholder="••••"></div>
-      <div class="group-input"><label>Thibitisha PIN Mpya</label><input type="password" inputmode="numeric" pattern="[0-9]*" maxlength="4" id="reset-new-pin2" placeholder="••••"></div>
-      <p id="reset-error"   style="color:#EF4444;font-size:12px;display:none;margin-bottom:10px;"></p>
-      <p id="reset-success" style="color:var(--admin-green);font-size:12px;display:none;margin-bottom:10px;"></p>
+      <button id="pin-reset-back" style="background:none;border:none;color:var(--wakala-primary);font-size:13px;font-weight:800;padding:0;margin-bottom:20px;display:flex;align-items:center;gap:6px;">
+        <i class="icon-left"></i> Rudi
+      </button>
+
+      <h3 style="font-size:17px;font-weight:800;color:var(--wakala-text);margin:0 0 4px;">Weka Upya PIN</h3>
+      <p style="font-size:12px;color:var(--wakala-text-muted);margin:0 0 22px;">Thibitisha PIN ya zamani kisha weka PIN mpya ya tarakimu 4.</p>
+
+      <div class="group-input">
+        <label>PIN ya Zamani</label>
+        <input type="password" inputmode="numeric" pattern="[0-9]*" maxlength="4" id="reset-old-pin" placeholder="••••">
+      </div>
+
+      <div class="group-input">
+        <label>PIN Mpya</label>
+        <input type="password" inputmode="numeric" pattern="[0-9]*" maxlength="4" id="reset-new-pin" placeholder="••••">
+      </div>
+
+      <div class="group-input">
+        <label>Thibitisha PIN Mpya</label>
+        <input type="password" inputmode="numeric" pattern="[0-9]*" maxlength="4" id="reset-new-pin2" placeholder="••••">
+      </div>
+
+      <p id="reset-error" style="color:var(--wakala-red);font-size:12px;display:none;margin-bottom:10px;"></p>
+      <p id="reset-success" style="color:var(--wakala-success);font-size:12px;display:none;margin-bottom:10px;"></p>
+
       <button class="tf-btn accent large" id="pin-reset-submit">Hifadhi PIN Mpya</button>
     </div>
   </div>
 
-  <!-- ===== Header ===== -->
-  <div class="admin-header">
-    <div class="admin-header-logo">
-      <i class="icon-secure1" style="font-size:17px;color:#fff;"></i>
+  <!-- =========================
+       HEADER
+  ========================== -->
+  <div class="header is-fixed header-admin">
+    <div class="tf-container">
+      <div class="tf-statusbar header-row d-flex align-items-center">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div style="width:32px;height:32px;border-radius:9px;background:rgba(255,255,255,0.14);display:flex;align-items:center;justify-content:center;">
+            <i class="icon-secure1" style="font-size:16px;color:#fff;"></i>
+          </div>
+          <div>
+            <p style="margin:0;font-size:9px;color:rgba(255,255,255,0.55);text-transform:uppercase;letter-spacing:.5px;">Wakala Point</p>
+            <h4 style="margin:0;font-size:13px;font-weight:800;color:#fff;">Admin Panel</h4>
+          </div>
+        </div>
+
+        <button onclick="doLogout()" style="background:rgba(255,255,255,0.12);border:none;color:#fff;font-size:11px;font-weight:800;padding:6px 14px;border-radius:20px;cursor:pointer;">
+          Toka
+        </button>
+      </div>
     </div>
-    <div class="admin-header-title">
-      <p>Wakala Point</p>
-      <h4>Admin Panel</h4>
-    </div>
-    <button class="admin-logout-btn" onclick="doLogout()">
-      <i class="icon-left" style="font-size:13px;"></i> Toka
-    </button>
   </div>
 
-  <!-- ===== Content ===== -->
-  <div id="app-wrap">
-    <div class="page-pad">
+  <!-- =========================
+       MAIN
+  ========================== -->
+  <div id="app-wrap" style="padding-top:70px;padding-bottom:70px;">
+    <div style="padding:14px 16px;">
 
-      <!-- Hero stat -->
-      <div class="stats-hero">
-        <div class="stats-hero-top">
+      <!-- STATS -->
+      <div class="stat-grid" id="stats-grid">
+        <div class="stat-card">
+          <p class="label">Maombi Yote</p>
+          <p class="value" id="stat-total" style="color:var(--wakala-primary);">—</p>
+        </div>
+
+        <div class="stat-card">
+          <p class="label">Yanasubiri</p>
+          <p class="value" id="stat-pending" style="color:#D97706;">—</p>
+        </div>
+
+        <div class="stat-card">
+          <p class="label">Yanashughulikiwa</p>
+          <p class="value" id="stat-processing" style="color:#1D5FA8;">—</p>
+        </div>
+
+        <div class="stat-card">
+          <p class="label">Yamekubaliwa</p>
+          <p class="value" id="stat-approved" style="color:#059669;">—</p>
+        </div>
+
+        <div class="stat-card full" style="display:flex;align-items:center;justify-content:space-between;">
           <div>
-            <p class="stats-hero-label">Maombi Yote</p>
-            <p class="stats-hero-value" id="stat-total">—</p>
-            <p class="stats-hero-sub" id="stat-today-label">Inapakia...</p>
+            <p class="label">Watumiaji Wote</p>
+            <p class="value" id="stat-users" style="color:#7C3AED;">—</p>
           </div>
           <div style="text-align:right;">
-            <p class="stats-hero-label">Yanasubiri</p>
-            <p style="font-size:28px;font-weight:900;color:var(--admin-amber);margin:0;" id="stat-pending">—</p>
-          </div>
-        </div>
-        <!-- Bar chart -->
-        <div id="status-chart-wrap" class="status-chart" style="padding:14px;margin:0;">
-          <p class="chart-title">Usambazaji wa Hali</p>
-          <div class="chart-bars" id="chart-bars">
-            <div class="chart-bar-wrap">
-              <span class="chart-bar-val" id="cv-pending">0</span>
-              <div class="chart-bar amber" id="cb-pending" style="height:4px;"></div>
-              <span class="chart-bar-label">Inasubiri</span>
-            </div>
-            <div class="chart-bar-wrap">
-              <span class="chart-bar-val" id="cv-processing">0</span>
-              <div class="chart-bar blue" id="cb-processing" style="height:4px;"></div>
-              <span class="chart-bar-label">Inashughulikiwa</span>
-            </div>
-            <div class="chart-bar-wrap">
-              <span class="chart-bar-val" id="cv-approved">0</span>
-              <div class="chart-bar green" id="cb-approved" style="height:4px;"></div>
-              <span class="chart-bar-label">Imekubaliwa</span>
-            </div>
-            <div class="chart-bar-wrap">
-              <span class="chart-bar-val" id="cv-rejected">0</span>
-              <div class="chart-bar red" id="cb-rejected" style="height:4px;"></div>
-              <span class="chart-bar-label">Imekataliwa</span>
-            </div>
+            <p class="label">Waliozuiwa</p>
+            <p class="value" id="stat-blocked" style="color:#DC2626;font-size:22px;">—</p>
           </div>
         </div>
       </div>
 
-      <!-- Mini stat grid -->
-      <div class="mini-stats">
-        <div class="mini-card blue">
-          <i class="icon-request mini-card-icon"></i>
-          <p class="mini-card-label">Inashughulikiwa</p>
-          <p class="mini-card-value" id="stat-processing">—</p>
-        </div>
-        <div class="mini-card green">
-          <i class="icon-checkmark mini-card-icon"></i>
-          <p class="mini-card-label">Imekubaliwa</p>
-          <p class="mini-card-value" id="stat-approved">—</p>
-        </div>
-        <div class="mini-card purple">
-          <i class="icon-profile mini-card-icon"></i>
-          <p class="mini-card-label">Watumiaji</p>
-          <p class="mini-card-value" id="stat-users">—</p>
-        </div>
-        <div class="mini-card red">
-          <i class="icon-secure1 mini-card-icon"></i>
-          <p class="mini-card-label">Waliozuiwa</p>
-          <p class="mini-card-value" id="stat-blocked">—</p>
-        </div>
-      </div>
-
-      <!-- REQUESTS section -->
+      <!-- =========================
+           REQUESTS SECTION
+      ========================== -->
       <div id="section-requests">
-        <p class="sec-label">Maombi</p>
+        <p class="section-heading">Maombi</p>
+
         <div class="pill-row">
           <button class="pill active" onclick="filterAdmin('yote',this)">Yote</button>
           <button class="pill" onclick="filterAdmin('pending',this)">Inasubiri</button>
@@ -354,68 +612,104 @@
           <button class="pill" onclick="filterAdmin('lipa-namba',this)">Lipa Namba</button>
           <button class="pill" onclick="filterAdmin('till-uwakala',this)">Till</button>
         </div>
+
         <div class="search-wrap">
           <i class="icon-search"></i>
           <input type="text" id="search-input" placeholder="Tafuta jina, simu, ID..." oninput="searchRequests()">
         </div>
+
         <div id="admin-list"></div>
       </div>
 
-      <!-- USERS section -->
+      <!-- =========================
+           USERS SECTION
+      ========================== -->
       <div id="section-users" style="display:none;">
-        <p class="sec-label">Watumiaji</p>
+        <p class="section-heading">Watumiaji</p>
+
         <div class="search-wrap">
           <i class="icon-search"></i>
           <input type="text" id="user-search-input" placeholder="Tafuta mtumiaji..." oninput="filterUsers()">
         </div>
+
         <div id="users-list">
-          <div class="admin-empty"><i class="icon-profile"></i><p>Inapakia...</p></div>
+          <div class="empty">
+            <i class="icon-profile"></i>
+            <p>Inapakia...</p>
+          </div>
         </div>
       </div>
 
     </div>
   </div>
 
-  <!-- ===== Bottom Nav ===== -->
+  <!-- =========================
+       BOTTOM NAV
+  ========================== -->
   <nav class="admin-nav">
     <button class="admin-nav-item active" id="nav-requests" onclick="switchSection('requests',this)">
       <i class="icon-request"></i>
       <span>Maombi</span>
-      <span class="nav-dot"></span>
     </button>
     <button class="admin-nav-item" id="nav-users" onclick="switchSection('users',this)">
       <i class="icon-profile"></i>
       <span>Watumiaji</span>
-      <span class="nav-dot"></span>
     </button>
   </nav>
 
-  <!-- ===== Request Modal ===== -->
+  <!-- =========================
+       REQUEST DETAIL MODAL
+  ========================== -->
   <div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
     <div class="modal-box" id="modal-box">
-      <div class="modal-hdr">
-        <p class="modal-hdr-title" id="modal-title"></p>
-        <div id="modal-status-badge" style="margin-bottom:8px;"></div>
-        <div class="modal-hdr-meta">
-          <div class="modal-hdr-meta-item"><p>ID</p><p id="modal-id"></p></div>
-          <div class="modal-hdr-meta-item"><p>Tarehe</p><p id="modal-date"></p></div>
+      <div class="modal-header">
+        <h3 id="modal-title"></h3>
+
+        <div class="modal-meta">
+          <div class="modal-meta-item">
+            <p>ID</p>
+            <p id="modal-id"></p>
+          </div>
+          <div class="modal-meta-item">
+            <p>Tarehe</p>
+            <p id="modal-date"></p>
+          </div>
+          <div class="modal-meta-item">
+            <p>Hali</p>
+            <p id="modal-status"></p>
+          </div>
         </div>
-        <button class="modal-close" onclick="closeModal(null)">
+
+        <button class="modal-close-btn" onclick="closeModal(null)">
           <i class="icon-close1" style="font-size:13px;position:static;color:#fff;"></i>
         </button>
       </div>
+
       <div class="modal-body">
-        <p class="modal-sec-label">Maelezo ya Ombi</p>
         <div id="modal-details"></div>
-        <p class="modal-sec-label">Simamia</p>
-        <select class="modal-select" id="modal-new-status">
-          <option value="pending">Inasubiri</option>
-          <option value="processing">Inashughulikiwa</option>
-          <option value="approved">Imekubaliwa</option>
-          <option value="rejected">Imekataliwa</option>
-        </select>
-        <textarea class="modal-textarea" id="modal-admin-note" rows="3" placeholder="Ujumbe kwa mteja (hiari)..."></textarea>
-        <button class="modal-save-btn" id="modal-save-btn" onclick="saveAdminAction()">
+
+        <hr class="divider" style="margin:14px 0;">
+
+        <p class="section-heading">
+          <i class="icon-setting1" style="margin-right:5px;"></i>Simamia Ombi
+        </p>
+
+        <div class="group-input">
+          <label>Badilisha Hali</label>
+          <select id="modal-new-status">
+            <option value="pending">Inasubiri</option>
+            <option value="processing">Inashughulikiwa</option>
+            <option value="approved">Imekubaliwa</option>
+            <option value="rejected">Imekataliwa</option>
+          </select>
+        </div>
+
+        <div class="group-input">
+          <label>Ujumbe kwa Mteja</label>
+          <textarea id="modal-admin-note" rows="3" style="resize:none;font-size:13px;" placeholder="Andika ujumbe..."></textarea>
+        </div>
+
+        <button class="tf-btn accent large" id="save-admin-btn" style="display:flex;align-items:center;justify-content:center;gap:8px;" onclick="saveAdminAction()">
           <i class="icon-checkmark"></i> Hifadhi Mabadiliko
         </button>
       </div>
@@ -426,141 +720,52 @@
   <script src="jquery.min.js"></script>
   <script src="wakala.js"></script>
   <script src="main.js"></script>
+
   <script>
-    /* ═══════════════════════════════════════
-       PIN
-    ═══════════════════════════════════════ */
+    /* =========================================================
+       CONFIG
+    ========================================================== */
     const PIN_LENGTH = 4;
     const DEFAULT_PIN = '1234';
+
     let enteredPin = '';
     let adminUid = null;
 
-    async function ensurePinInitialized() {
-      const existing = await getAdminPinHash(adminUid);
-      if (!existing) await setAdminPinHash(adminUid, await sha256Hex(DEFAULT_PIN));
-    }
+    let currentSection = 'requests';
 
-    function renderPinDots() {
-      document.querySelectorAll('#pin-dots .pin-dot').forEach((d, i) => {
-        d.classList.toggle('filled', i < enteredPin.length);
-        d.classList.remove('error');
-      });
-    }
+    let allRequests = [];
+    let currentFilter = 'yote';
+    let currentSearch = '';
+    let activeReqId = null;
 
-    function pinError(msg) {
-      document.getElementById('pin-error').textContent = msg;
-      document.querySelectorAll('#pin-dots .pin-dot').forEach(d => d.classList.add('error'));
-      document.getElementById('pin-dots').classList.add('pin-shake');
-      setTimeout(() => document.getElementById('pin-dots').classList.remove('pin-shake'), 400);
-    }
+    let allUsers = [];
 
-    async function checkPin() {
-      const stored  = await getAdminPinHash(adminUid);
-      const entered = await sha256Hex(enteredPin);
-      if (entered === stored) {
-        document.getElementById('pin-lock-screen').style.display = 'none';
-        sessionStorage.setItem('wp_admin_unlocked', '1');
-        await initAdminPanel();
-      } else {
-        pinError('PIN si sahihi. Jaribu tena.');
-        setTimeout(() => { enteredPin = ''; renderPinDots(); document.getElementById('pin-error').textContent = ''; }, 700);
-      }
-    }
-
-    function setupPinKeypad() {
-      // Use both touchend and click — touchend fires faster on mobile,
-      // click is the fallback. preventDefault on touchend stops the
-      // subsequent click from double-firing.
-      function addTap(el, fn) {
-        el.addEventListener('touchend', function(e) { e.preventDefault(); fn(); }, { passive: false });
-        el.addEventListener('click', fn);
-      }
-
-      document.querySelectorAll('.pin-key[data-num]').forEach(btn => {
-        addTap(btn, () => {
-          if (enteredPin.length >= PIN_LENGTH) return;
-          enteredPin += btn.dataset.num;
-          renderPinDots();
-          if (enteredPin.length === PIN_LENGTH) checkPin();
-        });
-      });
-
-      addTap(document.getElementById('pin-backspace-btn'), () => {
-        enteredPin = enteredPin.slice(0, -1);
-        renderPinDots();
-      });
-
-      addTap(document.getElementById('pin-forgot-btn'), () => {
-        document.getElementById('pin-lock-screen').style.display = 'none';
-        openResetScreen();
-      });
-    }
-
-    function openResetScreen() {
-      document.getElementById('pin-reset-screen').style.display = 'flex';
-      ['reset-old-pin','reset-new-pin','reset-new-pin2'].forEach(id => document.getElementById(id).value = '');
-      document.getElementById('reset-error').style.display   = 'none';
-      document.getElementById('reset-success').style.display = 'none';
-    }
-
-    function setupResetScreen() {
-      document.getElementById('pin-reset-back').addEventListener('click', () => {
-        document.getElementById('pin-reset-screen').style.display = 'none';
-        enteredPin = ''; renderPinDots();
-        document.getElementById('pin-lock-screen').style.display = 'flex';
-      });
-      ['reset-old-pin','reset-new-pin','reset-new-pin2'].forEach(id =>
-        document.getElementById(id).addEventListener('input', e => {
-          e.target.value = e.target.value.replace(/[^0-9]/g,'').slice(0,PIN_LENGTH);
-        })
-      );
-      document.getElementById('pin-reset-submit').addEventListener('click', async () => {
-        const oldPin  = document.getElementById('reset-old-pin').value;
-        const newPin  = document.getElementById('reset-new-pin').value;
-        const newPin2 = document.getElementById('reset-new-pin2').value;
-        const err = document.getElementById('reset-error');
-        const ok  = document.getElementById('reset-success');
-        err.style.display = ok.style.display = 'none';
-        if ([oldPin,newPin,newPin2].some(p => p.length !== PIN_LENGTH)) {
-          err.textContent = 'Jaza PIN zote (tarakimu 4 kila moja).'; err.style.display = 'block'; return;
-        }
-        if (await sha256Hex(oldPin) !== await getAdminPinHash(adminUid)) {
-          err.textContent = 'PIN ya zamani si sahihi.'; err.style.display = 'block'; return;
-        }
-        if (newPin !== newPin2) { err.textContent = 'PIN mpya hazifanani.'; err.style.display = 'block'; return; }
-        if (newPin === oldPin)  { err.textContent = 'PIN mpya lazima iwe tofauti.'; err.style.display = 'block'; return; }
-        try {
-          await setAdminPinHash(adminUid, await sha256Hex(newPin));
-          ok.textContent = 'PIN imebadilishwa!'; ok.style.display = 'block';
-          setTimeout(() => {
-            document.getElementById('pin-reset-screen').style.display = 'none';
-            enteredPin = ''; renderPinDots();
-            document.getElementById('pin-lock-screen').style.display = 'flex';
-          }, 1500);
-        } catch(e) { err.textContent = 'Hitilafu. Jaribu tena.'; err.style.display = 'block'; }
-      });
-    }
-
-    // Boot sequence — runs once DOM is ready
-    // 1. Verify Firebase Auth + admin status (server-side)
-    // 2. If ok, show PIN screen (already visible by default)
-    // 3. If session already unlocked, skip PIN and go straight to panel
-    async function boot() {
-      // Show a minimal loading state on the PIN screen while auth resolves
-      const pinErr = document.getElementById('pin-error');
-      pinErr.textContent = 'Inathibitisha...';
-
+    /* =========================================================
+       BOOT
+    ========================================================== */
+    document.addEventListener('DOMContentLoaded', async function () {
       try {
-        const ok = await requireAdmin();
-        if (!ok) return; // requireAdmin redirects on failure
-      } catch(e) {
-        pinErr.textContent = 'Hitilafu ya mtandao. Rejesha ukurasa.';
+        await bootAdminPage();
+      } catch (e) {
+        console.error('bootAdminPage error:', e);
+        showToast('Imeshindikana kufungua admin panel.');
+      }
+    });
+
+    async function bootAdminPage() {
+      // lazima awe admin
+      if (!(await requireAdmin())) return;
+
+      // subiri firebase iwe tayari
+      const fb = await wpFirebaseReady();
+      if (!fb || !fb.auth || !fb.auth.currentUser) {
+        showToast('Hakuna mtumiaji aliyepo kwenye mfumo.');
+        window.location.href = 'login.html';
         return;
       }
 
-      pinErr.textContent = '';
-      const fb = await wpFirebaseReady();
       adminUid = fb.auth.currentUser.uid;
+
       await ensurePinInitialized();
       setupPinKeypad();
       setupResetScreen();
@@ -572,150 +777,367 @@
       }
     }
 
-    document.addEventListener('DOMContentLoaded', function () {
-      // Small defer so Firebase modules finish loading
-      setTimeout(boot, 100);
-    });
-
-    /* ═══════════════════════════════════════
-       INIT
-    ═══════════════════════════════════════ */
     async function initAdminPanel() {
-      await Promise.all([loadRequests(), loadUsers()]);
+      await Promise.all([
+        loadRequests(),
+        loadUsers()
+      ]);
     }
 
-    /* ═══════════════════════════════════════
-       SECTION SWITCH
-    ═══════════════════════════════════════ */
-    let currentSection = 'requests';
+    /* =========================================================
+       PIN HELPERS
+    ========================================================== */
+    async function ensurePinInitialized() {
+      const existing = await getAdminPinHash(adminUid);
+      if (!existing) {
+        await setAdminPinHash(adminUid, await sha256Hex(DEFAULT_PIN));
+      }
+    }
+
+    function renderPinDots() {
+      document.querySelectorAll('#pin-dots .pin-dot').forEach((d, i) => {
+        d.classList.toggle('filled', i < enteredPin.length);
+        d.classList.remove('error');
+      });
+    }
+
+    function pinError(msg) {
+      document.getElementById('pin-error').textContent = msg || 'PIN si sahihi.';
+      document.querySelectorAll('#pin-dots .pin-dot').forEach(d => d.classList.add('error'));
+      document.getElementById('pin-dots').classList.add('pin-shake');
+      setTimeout(() => {
+        document.getElementById('pin-dots').classList.remove('pin-shake');
+      }, 400);
+    }
+
+    async function checkPin() {
+      try {
+        const stored = await getAdminPinHash(adminUid);
+        const entered = await sha256Hex(enteredPin);
+
+        if (stored && entered === stored) {
+          document.getElementById('pin-lock-screen').style.display = 'none';
+          sessionStorage.setItem('wp_admin_unlocked', '1');
+          await initAdminPanel();
+          return;
+        }
+
+        pinError('PIN si sahihi. Jaribu tena.');
+        setTimeout(() => {
+          enteredPin = '';
+          renderPinDots();
+          document.getElementById('pin-error').textContent = '';
+        }, 700);
+
+      } catch (e) {
+        console.error('checkPin error:', e);
+        pinError('Imeshindikana kuthibitisha PIN.');
+        setTimeout(() => {
+          enteredPin = '';
+          renderPinDots();
+          document.getElementById('pin-error').textContent = '';
+        }, 900);
+      }
+    }
+
+    function setupPinKeypad() {
+      document.querySelectorAll('.pin-key[data-num]').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          if (enteredPin.length >= PIN_LENGTH) return;
+          enteredPin += btn.dataset.num;
+          renderPinDots();
+
+          if (enteredPin.length === PIN_LENGTH) {
+            await checkPin();
+          }
+        });
+      });
+
+      document.getElementById('pin-backspace-btn').addEventListener('click', () => {
+        enteredPin = enteredPin.slice(0, -1);
+        renderPinDots();
+      });
+
+      document.getElementById('pin-forgot-btn').addEventListener('click', () => {
+        document.getElementById('pin-lock-screen').style.display = 'none';
+        openResetScreen();
+      });
+    }
+
+    function openResetScreen() {
+      document.getElementById('pin-reset-screen').style.display = 'flex';
+
+      ['reset-old-pin', 'reset-new-pin', 'reset-new-pin2'].forEach(id => {
+        document.getElementById(id).value = '';
+      });
+
+      document.getElementById('reset-error').style.display = 'none';
+      document.getElementById('reset-success').style.display = 'none';
+    }
+
+    function setupResetScreen() {
+      document.getElementById('pin-reset-back').addEventListener('click', () => {
+        document.getElementById('pin-reset-screen').style.display = 'none';
+        enteredPin = '';
+        renderPinDots();
+        document.getElementById('pin-lock-screen').style.display = 'flex';
+      });
+
+      ['reset-old-pin', 'reset-new-pin', 'reset-new-pin2'].forEach(id => {
+        document.getElementById(id).addEventListener('input', e => {
+          e.target.value = e.target.value.replace(/[^0-9]/g, '').slice(0, PIN_LENGTH);
+        });
+      });
+
+      document.getElementById('pin-reset-submit').addEventListener('click', async () => {
+        const oldPin  = document.getElementById('reset-old-pin').value;
+        const newPin  = document.getElementById('reset-new-pin').value;
+        const newPin2 = document.getElementById('reset-new-pin2').value;
+
+        const err = document.getElementById('reset-error');
+        const ok  = document.getElementById('reset-success');
+        const btn = document.getElementById('pin-reset-submit');
+
+        err.style.display = 'none';
+        ok.style.display = 'none';
+
+        if ([oldPin, newPin, newPin2].some(p => p.length !== PIN_LENGTH)) {
+          err.textContent = 'Jaza PIN zote (tarakimu 4 kila moja).';
+          err.style.display = 'block';
+          return;
+        }
+
+        if (newPin !== newPin2) {
+          err.textContent = 'PIN mpya hazifanani.';
+          err.style.display = 'block';
+          return;
+        }
+
+        if (newPin === oldPin) {
+          err.textContent = 'PIN mpya lazima iwe tofauti na ya zamani.';
+          err.style.display = 'block';
+          return;
+        }
+
+        btn.disabled = true;
+        btn.textContent = 'Inahifadhi...';
+
+        try {
+          const storedHash = await getAdminPinHash(adminUid);
+          const oldHash = await sha256Hex(oldPin);
+
+          if (!storedHash || oldHash !== storedHash) {
+            err.textContent = 'PIN ya zamani si sahihi.';
+            err.style.display = 'block';
+            return;
+          }
+
+          await setAdminPinHash(adminUid, await sha256Hex(newPin));
+          sessionStorage.removeItem('wp_admin_unlocked');
+
+          ok.textContent = 'PIN imebadilishwa!';
+          ok.style.display = 'block';
+
+          setTimeout(() => {
+            document.getElementById('pin-reset-screen').style.display = 'none';
+            enteredPin = '';
+            renderPinDots();
+            document.getElementById('pin-lock-screen').style.display = 'flex';
+          }, 1500);
+
+        } catch (e) {
+          console.error('PIN reset error:', e);
+          err.textContent = 'Hitilafu. Jaribu tena.';
+          err.style.display = 'block';
+        } finally {
+          btn.disabled = false;
+          btn.textContent = 'Hifadhi PIN Mpya';
+        }
+      });
+    }
+
+    /* =========================================================
+       SECTION SWITCHER
+    ========================================================== */
     function switchSection(section, btn) {
       currentSection = section;
+
       document.querySelectorAll('.admin-nav-item').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
+
       document.getElementById('section-requests').style.display = section === 'requests' ? '' : 'none';
-      document.getElementById('section-users').style.display    = section === 'users'    ? '' : 'none';
+      document.getElementById('section-users').style.display = section === 'users' ? '' : 'none';
     }
 
-    /* ═══════════════════════════════════════
+    /* =========================================================
        REQUESTS
-    ═══════════════════════════════════════ */
-    let allRequests = [];
-    let currentFilter = 'yote';
-    let currentSearch = '';
-    let activeReqId = null;
-
+    ========================================================== */
     async function loadRequests() {
-      document.getElementById('admin-list').innerHTML = '<div class="admin-empty"><i class="icon-request"></i><p>Inapakia...</p></div>';
+      const listEl = document.getElementById('admin-list');
+      listEl.innerHTML = '<div class="empty"><i class="icon-request"></i><p>Inapakia...</p></div>';
+
       try {
         allRequests = await getRequests();
+        if (!Array.isArray(allRequests)) allRequests = [];
+
+        // panga mpya juu
+        allRequests.sort((a, b) => {
+          const aT = parseRequestTime(a);
+          const bT = parseRequestTime(b);
+          return bT - aT;
+        });
+
         updateStats();
-        renderAdminList(filtered());
-      } catch(e) {
-        document.getElementById('admin-list').innerHTML = '<div class="admin-empty"><i class="icon-request"></i><h4>Hitilafu</h4><p>Imeshindwa kupakia maombi.</p></div>';
-        console.error('loadRequests:', e);
+        renderAdminList(filteredRequests());
+
+      } catch (e) {
+        console.error('loadRequests error:', e);
+        listEl.innerHTML = '<div class="empty"><i class="icon-request"></i><p>Hitilafu ya kupakia maombi.</p></div>';
       }
+    }
+
+    function parseRequestTime(r) {
+      if (!r) return 0;
+      if (typeof r.createdAt === 'number') return r.createdAt;
+      if (typeof r.timestamp === 'number') return r.timestamp;
+      if (typeof r.tarehe === 'number') return r.tarehe;
+      if (typeof r.tarehe === 'string') {
+        const t = Date.parse(r.tarehe);
+        return isNaN(t) ? 0 : t;
+      }
+      return 0;
     }
 
     function updateStats() {
-      const total      = allRequests.length;
-      const pending    = allRequests.filter(r => r.status === 'pending').length;
-      const processing = allRequests.filter(r => r.status === 'processing').length;
-      const approved   = allRequests.filter(r => r.status === 'approved').length;
-      const rejected   = allRequests.filter(r => r.status === 'rejected').length;
-
-      document.getElementById('stat-total').textContent      = total;
-      document.getElementById('stat-pending').textContent    = pending;
-      document.getElementById('stat-processing').textContent = processing;
-      document.getElementById('stat-approved').textContent   = approved;
-
-      // Bar chart
-      const max = Math.max(pending, processing, approved, rejected, 1);
-      const maxH = 56; // px
-      const bars = { pending, processing, approved, rejected };
-      for (const [key, val] of Object.entries(bars)) {
-        const bar = document.getElementById('cb-' + key);
-        const lbl = document.getElementById('cv-' + key);
-        if (bar) bar.style.height = Math.max(4, Math.round((val / max) * maxH)) + 'px';
-        if (lbl) lbl.textContent = val;
-      }
-
-      // Sub label
-      const sub = document.getElementById('stat-today-label');
-      if (sub) sub.textContent = pending + ' yanasubiri hatua yako';
+      document.getElementById('stat-total').textContent      = allRequests.length;
+      document.getElementById('stat-pending').textContent    = allRequests.filter(r => r.status === 'pending').length;
+      document.getElementById('stat-processing').textContent = allRequests.filter(r => r.status === 'processing').length;
+      document.getElementById('stat-approved').textContent   = allRequests.filter(r => r.status === 'approved').length;
     }
 
-    function filtered() {
+    function filteredRequests() {
       return allRequests.filter(r => {
-        const matchFilter = currentFilter === 'yote' ? true :
-          (currentFilter === 'lipa-namba' || currentFilter === 'till-uwakala')
-            ? r.type === currentFilter : r.status === currentFilter;
-        const q = currentSearch.toLowerCase();
+        const matchFilter =
+          currentFilter === 'yote'
+            ? true
+            : (currentFilter === 'lipa-namba' || currentFilter === 'till-uwakala')
+              ? r.type === currentFilter
+              : r.status === currentFilter;
+
+        const q = (currentSearch || '').toLowerCase().trim();
+        const details = r.details || {};
+
         const matchSearch = !q ||
-          r.id.toLowerCase().includes(q) ||
-          (r.userName||'').toLowerCase().includes(q) ||
-          (r.userPhone||'').toLowerCase().includes(q) ||
-          (r.details.jina||'').toLowerCase().includes(q);
+          String(r.id || '').toLowerCase().includes(q) ||
+          String(r.userName || '').toLowerCase().includes(q) ||
+          String(r.userPhone || '').toLowerCase().includes(q) ||
+          String(details.jina || '').toLowerCase().includes(q) ||
+          String(details.simu || '').toLowerCase().includes(q);
+
         return matchFilter && matchSearch;
       });
     }
 
-    function filterAdmin(f, btn) {
+    function filterAdmin(filterName, btn) {
       document.querySelectorAll('.pill').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
-      currentFilter = f;
-      renderAdminList(filtered());
+      currentFilter = filterName;
+      renderAdminList(filteredRequests());
     }
 
     function searchRequests() {
-      currentSearch = document.getElementById('search-input').value;
-      renderAdminList(filtered());
+      currentSearch = document.getElementById('search-input').value || '';
+      renderAdminList(filteredRequests());
     }
 
     function renderAdminList(list) {
       const el = document.getElementById('admin-list');
+
       if (!list.length) {
-        el.innerHTML = '<div class="admin-empty"><i class="icon-request"></i><h4>Hakuna Maombi</h4><p>Hakuna yanayolingana na chaguo lako</p></div>';
+        el.innerHTML = `
+          <div class="empty">
+            <i class="icon-request"></i>
+            <h4>Hakuna Maombi</h4>
+            <p>Hakuna yanayolingana</p>
+          </div>
+        `;
         return;
       }
-      el.innerHTML = list.map(r => `
-        <div class="req-card" onclick="openModal('${r.id}')">
-          <div class="req-card-top">
-            <span class="svc-tag">${serviceLabel(r.type)}</span>
-            <span class="sbadge sbadge-${r.status}">${statusLabel(r.status)}</span>
+
+      el.innerHTML = list.map(r => {
+        const details = r.details || {};
+        const name = details.jina || r.userName || '—';
+        const phone = r.userPhone || details.simu || '—';
+
+        return `
+          <div class="req-card" onclick="openModal('${escapeHtmlAttr(r.id || '')}')">
+            <div class="req-card-top">
+              <span class="svc-tag">${serviceLabel(r.type)}</span>
+              <span class="badge badge-${r.status || 'pending'}">${statusLabel(r.status)}</span>
+            </div>
+
+            <p class="req-card-name">${escapeHtml(name)}</p>
+
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;">
+              <p class="req-card-meta">${escapeHtml(phone)}</p>
+              <p class="req-card-meta">${escapeHtml(r.id || '—')} · ${formatDate(r.tarehe)}</p>
+            </div>
           </div>
-          <p class="req-card-name">${r.details.jina || r.userName || '—'}</p>
-          <div class="req-card-bottom">
-            <p class="req-card-meta"><i class="icon-call" style="font-size:11px;margin-right:3px;"></i>${r.userPhone || r.details.simu || '—'}</p>
-            <p class="req-card-meta">${r.id} · ${formatDate(r.tarehe)}</p>
-          </div>
-        </div>
-      `).join('');
+        `;
+      }).join('');
     }
 
-    /* ── Modal ── */
     function openModal(id) {
-      const req = allRequests.find(r => r.id === id);
+      const req = allRequests.find(r => String(r.id) === String(id));
       if (!req) return;
+
       activeReqId = id;
-      document.getElementById('modal-title').textContent = serviceLabel(req.type);
-      document.getElementById('modal-status-badge').innerHTML = `<span class="sbadge sbadge-${req.status}">${statusLabel(req.status)}</span>`;
-      document.getElementById('modal-id').textContent   = req.id;
-      document.getElementById('modal-date').textContent = formatDate(req.tarehe);
-      document.getElementById('modal-new-status').value = req.status;
-      document.getElementById('modal-admin-note').value = req.adminNote || '';
+
+      document.getElementById('modal-title').textContent  = serviceLabel(req.type);
+      document.getElementById('modal-id').textContent     = req.id || '—';
+      document.getElementById('modal-date').textContent   = formatDate(req.tarehe);
+      document.getElementById('modal-status').textContent = statusLabel(req.status);
+      document.getElementById('modal-new-status').value   = req.status || 'pending';
+      document.getElementById('modal-admin-note').value   = req.adminNote || '';
+
+      const details = req.details || {};
       const dMap = {
-        jina:'Jina Kamili',simu:'Simu',aina_id:'Aina ya ID',namba_id:'Namba ya ID',
-        jina_biashara:'Jina la Biashara',aina_biashara:'Aina ya Biashara',
-        namba_ya_biashara:'Namba ya Usajili',mtandao:'Mtandao',aina_wakala:'Aina ya Wakala',
-        mkoa:'Mkoa',wilaya:'Wilaya',kata:'Mtaa/Kata',umbali_wakala:'Umbali hadi Wakala',
-        mtaji:'Mtaji',mahali:'Sehemu ya Biashara',umri:'Umri',
-        historia_wakala:'Historia ya Wakala',maelezo:'Maelezo',eneo_maelezo:'Maelezo ya Eneo',
+        jina: 'Jina Kamili',
+        simu: 'Namba ya Simu',
+        aina_id: 'Aina ya Kitambulisho',
+        namba_id: 'Namba ya Kitambulisho',
+        jina_biashara: 'Jina la Biashara',
+        aina_biashara: 'Aina ya Biashara',
+        namba_ya_biashara: 'Namba ya Usajili',
+        mtandao: 'Mtandao',
+        aina_wakala: 'Aina ya Wakala',
+        mkoa: 'Mkoa',
+        wilaya: 'Wilaya',
+        kata: 'Mtaa/Kata',
+        umbali_wakala: 'Umbali hadi Wakala',
+        mtaji: 'Mtaji',
+        mahali: 'Sehemu ya Biashara',
+        umri: 'Umri',
+        historia_wakala: 'Historia ya Wakala',
+        maelezo: 'Maelezo',
+        eneo_maelezo: 'Maelezo ya Eneo'
       };
+
       let rows = '';
       for (const [key, label] of Object.entries(dMap)) {
-        if (req.details[key]) rows += `<div class="detail-row"><span class="detail-label">${label}</span><span class="detail-val">${req.details[key]}</span></div>`;
+        if (details[key]) {
+          rows += `
+            <div class="detail-row">
+              <span class="detail-label">${label}</span>
+              <span class="detail-val">${escapeHtml(details[key])}</span>
+            </div>
+          `;
+        }
       }
-      document.getElementById('modal-details').innerHTML = rows || '<p style="color:var(--admin-muted);font-size:12px;">Hakuna maelezo ya ziada.</p>';
+
+      document.getElementById('modal-details').innerHTML =
+        rows || '<p style="color:var(--wakala-text-muted);font-size:12px;">Hakuna maelezo ya ziada.</p>';
+
       document.getElementById('modal-overlay').style.display = 'block';
       document.body.style.overflow = 'hidden';
     }
@@ -729,45 +1151,61 @@
 
     async function saveAdminAction() {
       if (!activeReqId) return;
+
       const newStatus = document.getElementById('modal-new-status').value;
       const note = document.getElementById('modal-admin-note').value.trim();
-      const req = allRequests.find(r => r.id === activeReqId);
+      const req = allRequests.find(r => String(r.id) === String(activeReqId));
       if (!req) return;
-      const btn = document.getElementById('modal-save-btn');
-      btn.disabled = true; btn.textContent = 'Inahifadhi...';
+
+      const btn = document.getElementById('save-admin-btn');
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = 'Inahifadhi...';
+      }
+
       try {
-        await updateRequest(req._key, { status: newStatus, adminNote: note });
-        req.status    = newStatus;
+        await updateRequest(req._key, {
+          status: newStatus,
+          adminNote: note
+        });
+
+        req.status = newStatus;
         req.adminNote = note;
+
         updateStats();
-        renderAdminList(filtered());
-        document.getElementById('modal-overlay').style.display = 'none';
-        document.body.style.overflow = '';
-        activeReqId = null;
-        showToast('✓ Mabadiliko yamehifadhiwa');
-      } catch(e) {
+        renderAdminList(filteredRequests());
+
+        closeModal(null);
+        showToast('Mabadiliko yamehifadhiwa!');
+
+      } catch (e) {
+        console.error('saveAdminAction error:', e);
         showToast('Hitilafu: ' + (e.message || 'Jaribu tena.'));
-        console.error('saveAdminAction:', e);
       } finally {
-        btn.disabled = false;
-        btn.innerHTML = '<i class="icon-checkmark"></i> Hifadhi Mabadiliko';
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = '<i class="icon-checkmark"></i> Hifadhi Mabadiliko';
+        }
       }
     }
 
-    /* ═══════════════════════════════════════
+    /* =========================================================
        USERS
-    ═══════════════════════════════════════ */
-    let allUsers = [];
-
+    ========================================================== */
     async function loadUsers() {
-      document.getElementById('users-list').innerHTML = '<div class="admin-empty"><i class="icon-profile"></i><p>Inapakia...</p></div>';
+      const el = document.getElementById('users-list');
+      el.innerHTML = '<div class="empty"><i class="icon-profile"></i><p>Inapakia...</p></div>';
+
       try {
         allUsers = await getUsers();
+        if (!Array.isArray(allUsers)) allUsers = [];
+
         updateUserStats();
         renderUsers(allUsers);
-      } catch(e) {
-        document.getElementById('users-list').innerHTML = '<div class="admin-empty"><i class="icon-profile"></i><h4>Hitilafu</h4><p>Imeshindwa kupakia watumiaji.</p></div>';
-        console.error('loadUsers:', e);
+
+      } catch (e) {
+        console.error('loadUsers error:', e);
+        el.innerHTML = '<div class="empty"><i class="icon-profile"></i><p>Hitilafu ya kupakia watumiaji.</p></div>';
       }
     }
 
@@ -777,74 +1215,152 @@
     }
 
     function filterUsers() {
-      const q = document.getElementById('user-search-input').value.toLowerCase();
-      renderUsers(!q ? allUsers : allUsers.filter(u =>
-        (u.jina||'').toLowerCase().includes(q) ||
-        (u.email||'').toLowerCase().includes(q) ||
-        (u.simu||'').toLowerCase().includes(q)
+      const q = (document.getElementById('user-search-input').value || '').toLowerCase().trim();
+
+      if (!q) {
+        renderUsers(allUsers);
+        return;
+      }
+
+      renderUsers(allUsers.filter(u =>
+        String(u.jina || '').toLowerCase().includes(q) ||
+        String(u.email || '').toLowerCase().includes(q) ||
+        String(u.simu || '').toLowerCase().includes(q)
       ));
     }
 
     function renderUsers(list) {
       const el = document.getElementById('users-list');
+
       if (!list.length) {
-        el.innerHTML = '<div class="admin-empty"><i class="icon-profile"></i><h4>Hakuna Watumiaji</h4><p>Hakuna wanaolingana</p></div>';
+        el.innerHTML = `
+          <div class="empty">
+            <i class="icon-profile"></i>
+            <h4>Hakuna Watumiaji</h4>
+            <p>Hakuna wanaolingana</p>
+          </div>
+        `;
         return;
       }
+
       el.innerHTML = list.map(u => {
-        const initials  = (u.jina || 'U').split(' ').map(w => w[0]).join('').toUpperCase().slice(0,2);
+        const initials = (u.jina || 'U')
+          .split(' ')
+          .map(w => w[0])
+          .join('')
+          .toUpperCase()
+          .slice(0, 2);
+
         const isBlocked = u.blocked === true;
-        const isAdminU  = u.isAdmin === true;
-        const avClass   = isAdminU ? 'admin-av' : isBlocked ? 'blocked-av' : '';
+        const isAdminU = u.isAdmin === true;
+
         return `
-        <div class="user-card${isBlocked ? ' is-blocked' : ''}">
-          <div class="user-avatar ${avClass}">
-            ${isBlocked ? '<i class="icon-secure1" style="font-size:17px;color:#fff;position:static;"></i>' : initials}
+          <div class="user-card">
+            <div class="user-avatar${isBlocked ? ' blocked' : ''}">
+              ${isBlocked
+                ? '<i class="icon-secure1" style="font-size:18px;color:#fff;"></i>'
+                : escapeHtml(initials)}
+            </div>
+
+            <div class="user-info">
+              <p class="user-name">
+                ${escapeHtml(u.jina || 'Bila Jina')}
+                ${isAdminU ? '<span class="badge-admin">Admin</span>' : ''}
+                ${isBlocked ? '<span class="badge-blocked">Imezuiwa</span>' : ''}
+              </p>
+              <p class="user-sub">${escapeHtml(u.email || '—')}</p>
+              <p class="user-sub">${escapeHtml([u.simu, u.mkoa].filter(Boolean).join(' · ') || '—')}</p>
+            </div>
+
+            ${!isAdminU ? `
+              <button class="block-btn ${isBlocked ? 'fungua' : 'zuia'}" onclick="toggleBlock('${escapeHtmlAttr(u.uid)}', ${isBlocked})">
+                ${isBlocked
+                  ? '<i class="icon-checkmark" style="margin-right:3px;font-size:12px;"></i>Fungua'
+                  : '<i class="icon-secure1" style="margin-right:3px;font-size:12px;"></i>Zuia'}
+              </button>
+            ` : ''}
           </div>
-          <div class="user-info">
-            <p class="user-name">
-              ${u.jina || 'Bila Jina'}
-              ${isAdminU  ? '<span class="ubadge-admin">Admin</span>'   : ''}
-              ${isBlocked ? '<span class="ubadge-blocked">Imezuiwa</span>' : ''}
-            </p>
-            <p class="user-sub">${u.email || '—'}</p>
-            <p class="user-sub">${[u.simu, u.mkoa].filter(Boolean).join(' · ') || '—'}</p>
-          </div>
-          ${!isAdminU ? `
-          <button class="block-btn ${isBlocked ? 'do-unblock' : 'do-block'}" onclick="toggleBlock('${u.uid}',${isBlocked})">
-            <i class="${isBlocked ? 'icon-checkmark' : 'icon-secure1'}" style="font-size:12px;position:static;"></i>
-            ${isBlocked ? 'Fungua' : 'Zuia'}
-          </button>` : ''}
-        </div>`;
+        `;
       }).join('');
     }
 
     async function toggleBlock(uid, currentlyBlocked) {
-      const u = allUsers.find(u => u.uid === uid);
+      const u = allUsers.find(x => String(x.uid) === String(uid));
       if (!u) return;
+
       try {
         await setUserBlocked(uid, !currentlyBlocked);
         u.blocked = !currentlyBlocked;
         updateUserStats();
         filterUsers();
-        showToast(currentlyBlocked ? '✓ Akaunti imefunguliwa' : '⊘ Akaunti imezuiwa');
-      } catch(e) {
+        showToast(currentlyBlocked ? 'Akaunti imefunguliwa!' : 'Akaunti imezuiwa!');
+      } catch (e) {
+        console.error('toggleBlock error:', e);
         showToast('Hitilafu: ' + (e.message || 'Jaribu tena.'));
-        console.error('toggleBlock:', e);
       }
     }
 
-    /* ═══════════════════════════════════════
-       UTILS
-    ═══════════════════════════════════════ */
+    /* =========================================================
+       HELPERS
+    ========================================================== */
+    function statusLabel(status) {
+      switch (status) {
+        case 'pending': return 'Inasubiri';
+        case 'processing': return 'Inashughulikiwa';
+        case 'approved': return 'Imekubaliwa';
+        case 'rejected': return 'Imekataliwa';
+        default: return 'Haijulikani';
+      }
+    }
+
+    function serviceLabel(type) {
+      switch (type) {
+        case 'lipa-namba': return 'Lipa Namba';
+        case 'till-uwakala': return 'Till ya Uwakala';
+        default: return 'Ombi';
+      }
+    }
+
+    function formatDate(v) {
+      if (!v) return '—';
+
+      if (typeof v === 'number') {
+        try {
+          return new Date(v).toLocaleDateString('sw-TZ', {
+            day: '2-digit',
+            month: 'short',
+            year: 'numeric'
+          });
+        } catch (_) {
+          return '—';
+        }
+      }
+
+      if (typeof v === 'string') {
+        const parsed = Date.parse(v);
+        if (!isNaN(parsed)) {
+          return new Date(parsed).toLocaleDateString('sw-TZ', {
+            day: '2-digit',
+            month: 'short',
+            year: 'numeric'
+          });
+        }
+        return v;
+      }
+
+      return '—';
+    }
+
     function showToast(msg) {
       const old = document.querySelector('.wp-toast');
       if (old) old.remove();
+
       const t = document.createElement('div');
       t.className = 'wp-toast';
       t.textContent = msg;
       document.body.appendChild(t);
-      setTimeout(() => t.remove(), 2600);
+
+      setTimeout(() => t.remove(), 2500);
     }
 
     function doLogout() {
@@ -852,6 +1368,19 @@
         sessionStorage.removeItem('wp_admin_unlocked');
         logout();
       }
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? '')
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;');
+    }
+
+    function escapeHtmlAttr(value) {
+      return escapeHtml(value);
     }
   </script>
 </body>
