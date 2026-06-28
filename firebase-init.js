@@ -1,4 +1,5 @@
-/* ===== WAKALA POINT — Firebase Initialization (Auth + Realtime Database) ===== */
+/* ===== WAKALA POINT — Firebase Core Setup ===== */
+
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-app.js";
 import {
   getDatabase,
@@ -27,36 +28,32 @@ import {
   onAuthStateChanged,
 } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-auth.js";
 
-/* ===== Firebase Project Config ===== */
+/* ===== CONFIG ===== */
 const firebaseConfig = {
   apiKey: "AIzaSyB36tCsZPPstZvojZLE6srWUVNahdzgvZw",
   authDomain: "wakala-point.firebaseapp.com",
   projectId: "wakala-point",
-  storageBucket: "wakala-point.firebasestorage.app",
+  storageBucket: "wakala-point.appspot.com",
   messagingSenderId: "601072568380",
   appId: "1:601072568380:web:4210c8a78610413aeddb39",
-  measurementId: "G-D085CTF9C7"
 };
 
-/* ===== Initialize Firebase ===== */
+/* ===== INIT ===== */
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 const auth = getAuth(app);
 const googleProvider = new GoogleAuthProvider();
 
-/* ===== Optional: Google login always asks account picker ===== */
 googleProvider.setCustomParameters({
-  prompt: "select_account"
+  prompt: "select_account",
 });
 
-/* ===== Expose Firebase helpers to wakala.js =====
-   Kwa sababu firebase-init.js ni module lakini wakala.js ni classic script,
-   tunazitoa kwenye window ili wakala.js iweze kuzitumia.
-*/
+/* ===== GLOBAL EXPORT (important) ===== */
 window.__wpFirebase = {
-  // app + db
   app,
   db,
+  auth,
+
   ref,
   push,
   set,
@@ -69,8 +66,6 @@ window.__wpFirebase = {
   onValue,
   off,
 
-  // auth
-  auth,
   googleProvider,
   signInWithPopup,
   createUserWithEmailAndPassword,
@@ -81,5 +76,15 @@ window.__wpFirebase = {
   onAuthStateChanged,
 };
 
-/* ===== Notify other scripts that Firebase is ready ===== */
+/* ===== READY EVENT ===== */
 window.dispatchEvent(new Event("wp-firebase-ready"));
+
+/* ===== RESET PASSWORD HELPER ===== */
+window.resetPassword = async function (email) {
+  try {
+    await sendPasswordResetEmail(auth, email);
+    return true;
+  } catch (e) {
+    throw new Error(e.message);
+  }
+};
